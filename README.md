@@ -1,25 +1,8 @@
-package Protocol::WebSocket;
-
-use strict;
-use warnings;
-
-our $VERSION = '0.26';
-
-use Protocol::WebSocket::Frame;
-use Protocol::WebSocket::Handshake::Client;
-use Protocol::WebSocket::Handshake::Server;
-use Protocol::WebSocket::URL;
-
-1;
-__END__
-
-=encoding UTF-8
-
-=head1 NAME
+# NAME
 
 Protocol::WebSocket - WebSocket protocol
 
-=head1 SYNOPSIS
+# SYNOPSIS
 
     # Server side
     my $hs = Protocol::WebSocket::Handshake::Server->new;
@@ -49,13 +32,13 @@ Protocol::WebSocket - WebSocket protocol
         # We got a message!
     }
 
-=head1 DESCRIPTION
+# DESCRIPTION
 
 Client/server WebSocket message and frame parser/constructor. This module does
 not provide a WebSocket server or client, but is made for using in http servers
 or clients to provide WebSocket support.
 
-L<Protocol::WebSocket> supports the following WebSocket protocol versions:
+[Protocol::WebSocket](https://metacpan.org/pod/Protocol::WebSocket) supports the following WebSocket protocol versions:
 
     draft-ietf-hybi-17 (latest)
     draft-ietf-hybi-10
@@ -63,54 +46,54 @@ L<Protocol::WebSocket> supports the following WebSocket protocol versions:
     draft-hixie-75
 
 By default the latest version is used. The WebSocket version is detected
-automatically on the server side. On the client side you have set a C<version>
+automatically on the server side. On the client side you have set a `version`
 attribute to an appropriate value.
 
-L<Protocol::WebSocket> itself does not contain any code and cannot be used
+[Protocol::WebSocket](https://metacpan.org/pod/Protocol::WebSocket) itself does not contain any code and cannot be used
 directly. Instead the following modules should be used:
 
-=head2 High-level modules
+## High-level modules
 
-=head3 L<Protocol::WebSocket::Server>
+### [Protocol::WebSocket::Server](https://metacpan.org/pod/Protocol::WebSocket::Server)
 
 Server helper class.
 
-=head3 L<Protocol::WebSocket::Client>
+### [Protocol::WebSocket::Client](https://metacpan.org/pod/Protocol::WebSocket::Client)
 
 Client helper class.
 
-=head2 Low-level modules
+## Low-level modules
 
-=head3 L<Protocol::WebSocket::Handshake::Server>
+### [Protocol::WebSocket::Handshake::Server](https://metacpan.org/pod/Protocol::WebSocket::Handshake::Server)
 
 Server handshake parser and constructor.
 
-=head3 L<Protocol::WebSocket::Handshake::Client>
+### [Protocol::WebSocket::Handshake::Client](https://metacpan.org/pod/Protocol::WebSocket::Handshake::Client)
 
 Client handshake parser and constructor.
 
-=head3 L<Protocol::WebSocket::Frame>
+### [Protocol::WebSocket::Frame](https://metacpan.org/pod/Protocol::WebSocket::Frame)
 
 WebSocket frame parser and constructor.
 
-=head3 L<Protocol::WebSocket::Request>
+### [Protocol::WebSocket::Request](https://metacpan.org/pod/Protocol::WebSocket::Request)
 
 Low level WebSocket request parser and constructor.
 
-=head3 L<Protocol::WebSocket::Response>
+### [Protocol::WebSocket::Response](https://metacpan.org/pod/Protocol::WebSocket::Response)
 
 Low level WebSocket response parser and constructor.
 
-=head3 L<Protocol::WebSocket::URL>
+### [Protocol::WebSocket::URL](https://metacpan.org/pod/Protocol::WebSocket::URL)
 
 Low level WebSocket url parser and constructor.
 
-=head1 EXAMPLES
+# EXAMPLES
 
-For examples on how to use L<Protocol::WebSocket> with various event loops see
-C<examples/> directory in the distribution.
+For examples on how to use [Protocol::WebSocket](https://metacpan.org/pod/Protocol::WebSocket) with various event loops see
+`examples/` directory in the distribution.
 
-=head1 CREDITS
+# CREDITS
 
 In order of appearance:
 
@@ -144,15 +127,13 @@ Eric Wastl
 
 Greg Kennedy
 
-=head1 AUTHOR
+# AUTHOR
 
-Viacheslav Tykhanovskyi, C<vti@cpan.org>.
+Viacheslav Tykhanovskyi, `vti@cpan.org`.
 
-=head1 COPYRIGHT
+# COPYRIGHT
 
 Copyright (C) 2010-2018, Viacheslav Tykhanovskyi.
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl 5.10.
-
-=cut

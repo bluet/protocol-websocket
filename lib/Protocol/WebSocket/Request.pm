@@ -10,6 +10,15 @@ use MIME::Base64 ();
 
 use Protocol::WebSocket::Cookie::Request;
 
+sub new {
+    my $self = shift->SUPER::new(@_);
+    my (%params) = @_;
+
+    $self->{headers} = $params{headers} || [];
+
+    return $self;
+}
+
 sub new_from_psgi {
     my $class = shift;
     my $env = @_ > 1 ? {@_} : shift;
@@ -17,6 +26,8 @@ sub new_from_psgi {
     Carp::croak('env is required') unless keys %$env;
 
     my $version = '';
+
+    my $cookies;
 
     my $fields = {
         upgrade    => $env->{HTTP_UPGRADE},
@@ -53,16 +64,21 @@ sub new_from_psgi {
         $fields->{'sec-websocket-key2'} = $env->{HTTP_SEC_WEBSOCKET_KEY2};
     }
 
-    if ($version eq 'draft-ietf-hybi-10' || $version eq 'draft-ietf-hybi-17') {
+    if ($version eq 'draft-ietf-hybi-10') {
         $fields->{'sec-websocket-origin'} = $env->{HTTP_SEC_WEBSOCKET_ORIGIN};
     }
     else {
         $fields->{origin} = $env->{HTTP_ORIGIN};
     }
 
+    if ($env->{HTTP_COOKIE}) {
+        $cookies = Protocol::WebSocket::Cookie->new->parse($env->{HTTP_COOKIE});
+    }
+
     my $self = $class->new(
         version       => $version,
         fields        => $fields,
+        cookies       => $cookies,
         resource_name => "$env->{SCRIPT_NAME}$env->{PATH_INFO}"
           . ($env->{QUERY_STRING} ? "?$env->{QUERY_STRING}" : "")
     );
@@ -77,7 +93,18 @@ sub new_from_psgi {
     return $self;
 }
 
-sub cookies { shift->{cookies} }
+sub cookies {
+    if(@_ > 1) {
+        my $cookie = Protocol::WebSocket::Cookie->new;
+        return unless $_[1];
+
+        if (my $cookies = $cookie->parse($_[1])) {
+            $_[0]->{cookies} = $cookies;
+        }
+    } else {
+        return $_[0]->{cookies};
+    }
+}
 
 sub resource_name {
     @_ > 1 ? $_[0]->{resource_name} = $_[1] : $_[0]->{resource_name} || '/';
@@ -109,6 +136,12 @@ sub to_string {
 
     Carp::croak(qq/Host is required/) unless defined $self->host;
     $string .= "Host: " . $self->host . "\x0d\x0a";
+
+    if (ref $self->{cookies} eq 'Protocol::WebSocket::Cookie') {
+        my $cookie_string = $self->{cookies}->to_string;
+        $string .= 'Cookie: ' . $cookie_string . "\x0d\x0a"
+            if $cookie_string;
+    }
 
     my $origin = $self->origin ? $self->origin : 'http://' . $self->host;
     $origin =~ s{^http:}{https:} if $self->secure;
@@ -161,8 +194,13 @@ sub to_string {
     else {
         Carp::croak('Version ' . $self->version . ' is not supported');
     }
+    my @headers = @{$self->{headers}};
+    while (my ($key, $value) = splice @headers, 0, 2) {
+        $key =~ s{[\x0d\x0a]}{}gsm;
+        $value =~ s{[\x0d\x0a]}{}gsm;
 
-    # TODO cookies
+        $string .= "$key: $value\x0d\x0a";
+    }
 
     $string .= "\x0d\x0a";
 
@@ -384,11 +422,7 @@ sub _finalize {
       || $self->field('WebSocket-Protocol');
     $self->subprotocol($subprotocol) if $subprotocol;
 
-    my $cookie = $self->_build_cookie;
-    if (my $cookies = $cookie->parse($self->field('Cookie'))) {
-        $self->{cookies} = $cookies;
-    }
-
+    $self->cookies($self->field('Cookie'));
     return $self;
 }
 

@@ -1,16 +1,111 @@
 Revision history for perl module Protocol::WebSocket
 
-0.12
+{{$NEXT}}
+
+0.26 2019-03-09T09:35:15Z
+
+ - Introduce MAX_FRAGMENTS_AMOUNT to change the allowable amount of fragments (Daniel Kamil Kozar)
+ - Update draft-ietf-hybi-00 tests to include the error text in response line (Daniel Kamil Kozar)
+
+0.25 2019-03-09T09:31:45Z
+
+ - The "Wrong response line" error now includes the actual response line (Max Maischein)
+
+0.24 2018-01-13T09:59:07Z
+
+ -  draft-ietf-hybi-17 uses origin header, not sec-websocket-origin (Eric Wastl)
+
+0.23 2017-12-12T19:16:32Z
+
+ - revert previous release
+
+0.22 2017-12-08T17:24:15Z
+
+ - reliable UTF-8 bahaviour (Paul "LeoNerd" Evans #GH-35, #GH-52)
+ - document masked frame attribute
+
+0.21 2017-09-04T17:06:56Z
+
+ - MAX_PAYLOAD_SIZE global var
+ - MAX_MESSAGE_SIZE global var
+
+0.20 2016-11-04T18:21:37Z
+
+ - RSV bit (Anton Petrusevich)
+ - do not modify passed headers structure (Graham Ollis)
+ - bypass max payload size (Graham Ollis)
+
+0.19 2015-09-28T16:55:01Z
+
+ - custom headers in request
+ - fix wrong UTF-8 related documentation (#GH-13)
+
+0.18 2014-09-01T14:45:16Z
+
+ - Digest::SHA1 -> Digest::SHA (Michal Špaček)
+
+0.17 2014-04-09T08:12:01Z
+
+ - perl 5.8 unpack fix (Graham Ollis)
+ - doc and test fixes (Michal Špaček)
+
+0.16 2014-01-07T20:33:59Z
+
+ - just meta files update
+
+0.15 2013-11-03T15:54:47Z
+
+ - Explicitly stringify $payload in _mask() method (Toshio Ito)
+
+0.14 2013-10-14T08:50:38Z
+
+ - Fix Changes file (Neil Bowers)
+ - Fix distribution (reported by Géraud CONTINSOUZAS)
+
+0.13 2013-10-13T17:17:03Z
+
+ - Implemented set cookies for requests (Joao Orui)
+
+ The following changes made by Toshio Ito (debug-ito):
+ - Add test in which Frame class generates and parses a series of fragments.
+ - Add test for destructiveness of append() method.
+ - Documentation: add remarks about destructiveness of append() method.
+   Sometimes it's useful, the other times it's confusing.
+ - Add documentation of "version" field in new() method.
+ - Add documentation of "masked" field in new() method.
+ - Remove fin() accessor from documentation and test. If a message is
+   fragmented, the return value of fin() is meaningless anyway. Plus, probably
+   current implementation does not handle fin flags if control frames are
+   injected in non-control fragments. If we want fin() accessor, the test for
+   that case is necessary.
+ - Add documentation about "opcode" field in new() method and opcode() accessor
+   method. tests are also added.
+ - Add is_continuation() method.
+ - Now "type" field for new() is immediately resolved to opcode, so that
+   new(type => $type) and is_{type} methods are now consistent. This fixes
+   github issue vti/protocol-websocket#19 ($frame->{type} field is preserved for
+   backward-compatibility, but direct assignment $frame->{type} = "close"
+   followed by $frame->to_bytes() will not work anymore. However, direct
+   assignment is considered rude anyway...)
+ - Add "continuation" frame type. opcode() method is revised so that it can
+   correctly return 0 if $frame->{opcode} == 0.
+ - POD update: ATTRIBUTES - type section is moved under new() method. This is
+   way more straightforward.
+ - Document "fin" field in the constructor and fin() accessor. to_bytes() now
+   encodes "fin" bit according to the fin field of the Frame object.
+
+0.12 2012-10-24
 
  - Improved frame performance (Chuck Bredestege)
+ - Check origin only if origin is present (Matthew Lien)
 
-0.11
+0.11 2012-08-28
 
  - Added wsconsole
  - Fixed default version in WebSocket Frame
  - Fixed default ports in WebSocket URL
 
-0.10
+0.10 2012-08-21
 
  - Fixed origin issue in hybi-17
  - Added query string in resource name (Atomer Ju)
@@ -37,8 +132,8 @@ Revision history for perl module Protocol::WebSocket
 
 0.00902 2011-05-12
 
- - API CHANGE: Frame's to_string now returns a Perl string, use to_bytes to get a
-   UTF-8 encoded octets
+ - API CHANGE: Frame's to_string now returns a Perl string,
+   use to_bytes to get a UTF-8 encoded octets
  - Automatically decode when building frame from a Perl string
  - Pay attention to SCRIPT_NAME in PSGI
  - If an origin was passed in, don't change it (Jon Gentle)
@@ -75,3 +170,4 @@ Revision history for perl module Protocol::WebSocket
 0.0002 2010-11-26
 
  - Initial release
+
